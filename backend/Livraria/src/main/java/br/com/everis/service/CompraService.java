@@ -1,29 +1,27 @@
 package br.com.everis.service;
 
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
+import br.com.everis.client.FornecedorClient;
 import br.com.everis.dto.CompraDTO;
 import br.com.everis.dto.InfoFornecedorDTO;
+import br.com.everis.dto.InfoPedidoDTO;
 
 @Service
 public class CompraService {
 
-	private final String endpointFornecedor = "http://fornecedor/info/%s";
-	private final RestTemplate _client;
+	private final FornecedorClient _fornecedorClient;
 
-	public CompraService(RestTemplate client){
-		this._client = client;
+	public CompraService(FornecedorClient fornecedorClient) {
+		this._fornecedorClient = fornecedorClient;
 	}
 
 	public void realizaCompra(CompraDTO compraDTO) {
-		
-		ResponseEntity<InfoFornecedorDTO> infoFornecedor = _client.exchange(String.format(endpointFornecedor, compraDTO.getEndereco().getEstado()),
-		 HttpMethod.GET, null, InfoFornecedorDTO.class);
 
-		 System.out.println(infoFornecedor.getBody().getEndereco());
+		InfoFornecedorDTO infoFornecedoDTO = _fornecedorClient.buscarFornecedorPorEstador(compraDTO.getEndereco().getEstado());
+
+		InfoPedidoDTO infoPedidoDTO = _fornecedorClient.realizaPedido(compraDTO.getItems());
+
+		System.out.println(infoFornecedoDTO.getEndereco());
 	}
-	
+
 }
